@@ -17,6 +17,7 @@ public class follow : MonoBehaviour {
 		
 		Vector3 pos1 = new Vector3(sphere.transform.position.x,sphere.transform.position.y+charSphereOffset, transform.position.z); // CHANGE THIS UPON AXIS CHANGE
 		gameObject.transform.position = pos1;
+		gameObject.transform.rotation = sphere.transform.rotation;
 		
 	}
 }

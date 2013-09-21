@@ -8,6 +8,7 @@ public class shootScript : MonoBehaviour
 	Color[] colors = { Color.yellow, Color.red};
     int colorIndex = 0;
 	public int count = 0;
+	public int tapEq = 0;
 	
 	public GameObject sphere;
     public GameObject portalBullet;
@@ -16,8 +17,8 @@ public class shootScript : MonoBehaviour
 	bool moveUp = true;
 	bool handMoving = false;
 	bool continueRotating = true;
-	float angleX = 0;
-	float tapAngle = 80;
+	int angleX = 0;
+	int tapAngle = 80;
 	Vector3 angleFinal;
 	
 	String msg = "blah";
@@ -39,20 +40,35 @@ public class shootScript : MonoBehaviour
 	Vector3 target = new Vector3(0,83,-170);
 	CharacterAnim animScript;
 	touchMonitor tapScript;
+	movement moveScript;
 	bool execAgain = false;
+	
+	bool tempSwipeDisable = false;
+	
     //bulletSpawn bulletSpawn;
 	Helpers helperScript;
+	
+	
+	
+	public delegate void angleEventHandler();
+	public static event angleEventHandler angleEvent;
+	
+	
+	
 	
 	// Use this for initialization
 	void Start () 
 	{
-		
+		moveScript = sphere.GetComponent("movement") as movement;
 		animScript = gameObject.GetComponent("CharacterAnim") as CharacterAnim;
 		tapScript = sphere.GetComponent("touchMonitor") as touchMonitor;
        // bulletSpawn = sphere.GetComponent("bulletSpawn") as bulletSpawn;
 		moveHandBone = false;
-		
-	
+		touchMonitor.tapMonitor += tapDetected;
+		angleEvent += angleMethod;
+		// HANDLE THE CASE WHERE HE INSTANTIATES MULTIPLE BULLETS WHEN ANGLES R LOW...
+		// USE EVENTS FOR SWIPE 
+		// EVENTS FOR ANIMS
 	}
 	
 	void OnGUI()
@@ -62,37 +78,10 @@ public class shootScript : MonoBehaviour
 		GUI.Label(new Rect(200,300,200,100),tapMessage);
 	}
 	
-	void OnEnabled()
-	{
-		touchMonitor.tapMonitor += tapDetected;
-	}
 	
 	// Update is called once per frame
 	void Update () 
 	{
-		//msg = count.ToString();
-//		Vector2 tapPosition = tapScript.tap.sendValues();
-//		
-//		if(tapPosition.x > -1)
-//		{
-//			msg = tapPosition.ToString();
-//			
-//			Vector3 posVector = cam.WorldToScreenPoint(transform.position);
-//			//Debug.Log(posVector);
-//	       	Vector2 vectorTwo = GUIUtility.ScreenToGUIPoint( new Vector2( posVector.x, posVector.y ) );             //posVector.x maybe replaced by posVector.z based on main camera's rotation.
-//			int angle = Mathf.RoundToInt(  Helpers.angleCalc( tapPosition, posVector ) );
-//			int[] resolvedAngles = Helpers.resolveRotation( angle );
-//			angleFinal = new Vector3( 0, resolvedAngles[0], resolvedAngles[1] );
-//	       
-//			tapAngle = angle + 90;
-//			
-//			angleMessage = angle.ToString();
-//			
-//			moveHandBone = true;
-//			continueRotating = true;
-//			addTransforms();
-//		}
-		
 		
 		if(moveHandBone)
 		{
@@ -101,19 +90,13 @@ public class shootScript : MonoBehaviour
 			animScript.idleAnimStart = false;
 			//animScript.idleStartTime = (int)Time.time;
 			print("inside movehandbone!");
-			handMoving = true;
 			
 			
-			if(angleX == tapAngle)
-			{
-				moveUp = false;
-                //bulletSpawn();
-				
-                
-			}
-            else if (angleX > tapAngle)
+         	if (angleX > tapAngle)
             {
+				angleX = tapAngle;
                 moveUp = false;
+				//angleEvent();
             }
             else if (angleX < 0)
             {
@@ -124,25 +107,41 @@ public class shootScript : MonoBehaviour
                 moveUp = true;
             }
 			
+			if(angleX == tapAngle)
+			{
+				moveUp = false;
+				angleEvent();
+			}
+			
+			
 			if(continueRotating && moveUp)
 			{
-				angleX += 16f; // Speed control for Up rotation - this varies with framrate of game .. so equalize it using some own function!
+				angleX += 16; // Speed control for Up rotation - this varies with framrate of game .. so equalize it using some own function!
 			}
 			else if(continueRotating && !moveUp)
 			{
-				angleX -= 16f;// Speed control for Down rotation
+				angleX -= 16;// Speed control for Down rotation
 			}
 			
 			if(continueRotating == false)
 			{
+				msg = "shot "+tapEq+"times";
 				animScript.idleAnimStart = true;
 				animScript.idleStartTime = (int)Time.time;
 				angleX = 0;
 				removeTransforms();
 				palm_r.transform.eulerAngles = new Vector3(0,180,90); // reset the palm rotation to idle position
 				//tapPosition = new Vector2(-1,-1);
+				tapEq = 0;
+				
+				if(tempSwipeDisable)
+				{
+					tempSwipeDisable = false;
+					moveScript.enableSwipe();
+				}
 			}
 			
+			handMoving = true;
 		}
 		else
 		{
@@ -153,10 +152,16 @@ public class shootScript : MonoBehaviour
 		
 	}
 	
+	
+	void angleMethod()
+	{
+		bulletSpawn();
+	}
+	
 	void tapDetected(Vector2 tapPosition)
 	{
 		//tapPosition = tapScript.tap.sendValues();
-		msg = tapPosition.ToString();
+		//msg = "DETECT!: "+tapPosition;
 			
 		Vector3 posVector = cam.WorldToScreenPoint(transform.position);
 		//Debug.Log(posVector);
@@ -165,14 +170,64 @@ public class shootScript : MonoBehaviour
 		int[] resolvedAngles = Helpers.resolveRotation( angle );
 		angleFinal = new Vector3( 0, resolvedAngles[0], resolvedAngles[1] );
        
-		tapAngle = angle + 90;
+		tapAngle = angle;
 		
-		angleMessage = angle.ToString();
+		//angleMessage = angle.ToString();
 		
 		moveHandBone = true;
 		continueRotating = true;
 		addTransforms();
-	
+		
+		
+		if((moveScript.delta == 1) && Mathf.Abs(tapAngle) > 90 )
+		{
+			moveScript.changeDelta(Mathf.Abs(tapAngle));
+			sphere.transform.eulerAngles = new Vector3(0,180,0);
+			if(tapAngle > 0)
+			{
+				tapAngle = tapAngle - ((tapAngle - 90) * 2);
+			}
+			else
+			{
+				tapAngle = Mathf.Abs(tapAngle);
+				tapAngle = tapAngle - ((tapAngle - 90) * 2);
+				tapAngle = -tapAngle;
+			}
+			
+			if(moveScript.swipe)
+			{
+				moveScript.disableSwipe();
+				tempSwipeDisable = true;
+			}
+			
+		}
+		else if((moveScript.delta == -1) && Mathf.Abs(tapAngle) <= 90 )
+		{
+			moveScript.changeDelta(Mathf.Abs(tapAngle));
+			sphere.transform.eulerAngles = new Vector3(0,0,0);
+			
+			//tapAngle = tapAngle + 180;
+		}
+		else if((moveScript.delta) == -1 && Mathf.Abs(tapAngle) > 90)
+		{
+			if(tapAngle > 0)
+			{
+				tapAngle = tapAngle - ((tapAngle - 90) * 2);
+			}
+			else
+			{
+				tapAngle = Mathf.Abs(tapAngle);
+				tapAngle = tapAngle - ((tapAngle - 90) * 2);
+				tapAngle = -tapAngle;
+			}
+			
+		}
+		//else if( (moveScript.delta) == 1 && Mathf.Abs(tapAngle - 90) <= 90 )
+		
+		
+		
+		tapAngle = tapAngle + 90;
+		//angleMessage = tapAngle.ToString();
 	}
 	
 	void removeTransforms()
@@ -199,13 +254,13 @@ public class shootScript : MonoBehaviour
 	void LateUpdate()
 	{
 		// PC SHOOT - CLICK
-		if(Input.GetMouseButtonDown(0))
-		{
-			moveHandBone = true;
-			continueRotating = true;
-			addTransforms();
-				
-		}
+//		if(Input.GetMouseButtonDown(0))
+//		{
+//			moveHandBone = true;
+//			continueRotating = true;
+//			addTransforms();
+//				
+//		}
 		
 		
 		
@@ -221,7 +276,7 @@ public class shootScript : MonoBehaviour
 			if(animation.IsPlaying("run"))
 			{
 				//Debug.Log ("hangle: "+hand_r.localEulerAngles);
-				hand_r.localEulerAngles = new Vector3(0,90,biceps_R.transform.eulerAngles.z - angleX);
+				hand_r.localEulerAngles = new Vector3(0,90,-150 - angleX); //biceps_R.transform.eulerAngles.z
 				forearm_R.localEulerAngles = new Vector3(0,0,-20); // Refined look while shooting
 				//Debug.Log ("hangle: "+hand_r.localEulerAngles);
 				handMoving = true;
@@ -246,12 +301,13 @@ public class shootScript : MonoBehaviour
 	
 	void bulletSpawn()
 	{
-		msg = "came here at: "+Time.time;
+		//msg = "came here at: "+Time.time;
 		GameObject bulletInstance = (GameObject)Instantiate( portalBullet, palm_r.position, Quaternion.Euler(angleFinal) );
 		count++;
       	portalBullet bulletScript = bulletInstance.GetComponent<portalBullet>();
         bulletScript.setColor( colors[colorIndex] );
         colorIndex = (colorIndex + 1) % 2;
+		angleMessage = "inst: "+count;
 	}
 	
 }

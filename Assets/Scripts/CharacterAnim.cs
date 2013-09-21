@@ -122,7 +122,7 @@ public class CharacterAnim : MonoBehaviour {
 		if(swipeScript.swipe.swipeEnd)
 		{
 			
-			if(sphere.rigidbody.velocity.x > 3.5) // CHANGE THIS UPON AXIS CHANGE
+			if(Mathf.Abs(sphere.rigidbody.velocity.x) > 3.5) // CHANGE THIS UPON AXIS CHANGE
 			{
 				animation.Play("stopWalk");
 				startRun = false;
@@ -141,44 +141,10 @@ public class CharacterAnim : MonoBehaviour {
 			
 		}
 		
-		/*
-		if(swipeScript.swipe.swipeAngle > 45 && swipeScript.swipe.swipeAngle <= 120)
-		{
-			charInAir = true;
-			sphere.rigidbody.AddForce(0,42,25,ForceMode.Impulse);
-
-			isJumping = true;
-			
-			if(sphere.rigidbody.velocity.z > 2.5)
-			{
-				//print ("ypos: "+transform.position.y+" startY+: "+startYpos + 0.5);
-				animation.Play("jumpWhileRun");
-				waitingForIdleAnim = false;
-
-			
-			}
-			else
-			{
-				animation.Play("jump");
-				waitingForIdleAnim = false;
-			}
-			
-		}
-		
-		*/
-		
-		
-		
-		
-		
-		
-		
-		
-		
 		//******************************* PC CONTROLS
 		
 		
-		if(Input.GetKeyDown("a"))
+		if(Input.GetKeyDown("a") || Input.GetKeyDown("d") )
 		{
 			idleAnimStart = false;
 			animation.CrossFade("startWalk",4f);
@@ -189,7 +155,7 @@ public class CharacterAnim : MonoBehaviour {
 		}
 		
 		
-		if(Input.GetKey("a"))
+		if(Input.GetKey("a") || Input.GetKey("d"))
 		{
 			idleAnimStart = false;
 			updateStartWalkStatus();
@@ -201,10 +167,10 @@ public class CharacterAnim : MonoBehaviour {
 			updateRunAnimSpeed();
 		}
 		
-		if(Input.GetKeyUp("a"))
+		if(Input.GetKeyUp("a") || Input.GetKeyUp("d"))
 		{
 			
-			if(sphere.rigidbody.velocity.x > 3.5)
+			if(Mathf.Abs(sphere.rigidbody.velocity.x)  > 3.5)
 			{
 				animation.Play("stopWalk");
 				startRun = false;
@@ -222,7 +188,7 @@ public class CharacterAnim : MonoBehaviour {
 			
 		}
 		
-		if(sphere.rigidbody.velocity.x <0.2)
+		if(Mathf.Abs(sphere.rigidbody.velocity.x) <0.2)
 		{
 			updateIdleAnimSatus();
 		}
@@ -307,7 +273,7 @@ public class CharacterAnim : MonoBehaviour {
 	void updateRunAnimSpeed()	
 	{
 		
-		animation["run"].speed = (float)0.2*sphere.rigidbody.velocity.x;
+		animation["run"].speed = (float)0.2*Mathf.Abs(sphere.rigidbody.velocity.x);
 		/*
 		foreach(AnimationState animState in animation)
 		{

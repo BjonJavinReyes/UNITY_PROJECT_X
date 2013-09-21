@@ -5,6 +5,10 @@ public class EventManager : MonoBehaviour
 {
 	public delegate void someHandler();
 	public static event someHandler handlerMethod;
+	
+	
+	public delegate void angleEventHandler();
+	public static event angleEventHandler angleEvent;
 
 	// Use this for initialization
 	void Start () {

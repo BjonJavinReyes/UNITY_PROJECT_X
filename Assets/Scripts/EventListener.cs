@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class EventListener
+public class EventListener : MonoBehaviour 
 {
 	void OnEnable()
 	{
@@ -18,4 +18,13 @@ public class EventListener
 		Debug.Log("Event handled!");
 	}
 	
+	// Use this for initialization
+	void Start () {
+	
+	}
+	
+	// Update is called once per frame
+	void Update () {
+	
+	}
 }
