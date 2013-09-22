@@ -17,7 +17,7 @@ public class mainSwitch : MonoBehaviour {
     {
 		//Debug.Log("collided");
         GameObject collObject = collision.gameObject;
-        if ( collObject.name == Constants.PORTALBULLET )
+        if ( collObject.name == Constants.PortalBullet )
             transform.parent.GetComponent<Switch>().incrementState();
     }
 }

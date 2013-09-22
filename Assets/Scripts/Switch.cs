@@ -62,11 +62,11 @@ public class Switch : MonoBehaviour
     void OnTriggerEnter( Collider collider )
     {
         GameObject collObject = collider.gameObject;
-        if ( collObject.name == Constants.PORTALBULLET && !playerNear )                
+        if ( collObject.name == Constants.PortalBullet && !playerNear )                
         {
        		magneticAbsorption( collObject );
         }
-        else if ( collObject.name == Constants.PLAYERNAME )
+        else if ( collObject.name == Constants.PlayerName)
         {
             invertFlags();
         }
@@ -92,7 +92,7 @@ public class Switch : MonoBehaviour
 
     void OnTriggerExit(Collider collider)
     {
-        if ( collider.gameObject.name == Constants.PLAYERNAME )
+        if ( collider.gameObject.name == Constants.PlayerName )
         {
             invertFlags();
         }

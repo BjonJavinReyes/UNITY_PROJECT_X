@@ -5,7 +5,6 @@ using System;
 public class tiltWall : MonoBehaviour, SwitchInterface
 {
 	SwitchClass switchClass;
-	camScript cameraScript;
 	public int state = 0;
 	public int[] targetVals = new int[]{ 0, 90, 180, 270 };
 	
