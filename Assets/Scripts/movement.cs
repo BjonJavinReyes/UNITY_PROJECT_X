@@ -19,7 +19,7 @@ public class movement : MonoBehaviour {
 	public bool swipe = false;
 	
 	// Use this for initialization
-	void Start () 
+	void Start ()
 	{
 		rotAngleLeft = new Vector3(0,180,0);
 		rotAngleRight = new Vector3(0,0,0);
@@ -27,7 +27,7 @@ public class movement : MonoBehaviour {
 		animScript = character.GetComponent("CharacterAnim") as CharacterAnim;
 		
 		startYpos = gameObject.transform.position.y;
-		constVel = new Vector3(8f * delta,0,0); // CHANGE THIS UPON AXIS CHANGE
+		constVel = new Vector3(8f * delta, 0, 0); // CHANGE THIS UPON AXIS CHANGE
 		
 		swipe = swipeScript.swipe.swipeActive;
 	}
@@ -36,8 +36,8 @@ public class movement : MonoBehaviour {
 	void Update () 
 	{
 		
-		constVel = new Vector3(8f * delta,0,0);
-		if(!swipeOff)
+		constVel = new Vector3(8f * delta, 0, 0);
+		if( !swipeOff )
 		{
 			swipe = swipeScript.swipe.swipeActive;
 		}
@@ -48,7 +48,7 @@ public class movement : MonoBehaviour {
 		gameObject.rigidbody.AddForce(0,-32,0,ForceMode.Force);
 
 		//**************** DROID *********
-		if(swipe && Mathf.Abs(swipeScript.swipe.swipeAngle) <=90 )
+		if( swipe && Mathf.Abs( swipeScript.swipe.swipeAngle ) <=90 )
 		{
 			delta = 1;
 			

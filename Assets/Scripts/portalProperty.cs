@@ -17,7 +17,7 @@ public class portalProperty : MonoBehaviour {
 	void OnTriggerEnter(Collider collision)				//CDV
 	{
 		GameObject collObject = collision.gameObject;
-		if(collObject.name == "portalBullet")
+		if(collObject.name == Constants.PortalBullet)
 		{
 			int zValue,yValue;
 			int optValueY = Mathf.CeilToInt( transform.rotation.eulerAngles.y );

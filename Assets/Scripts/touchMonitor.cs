@@ -33,7 +33,7 @@ public class touchMonitor : MonoBehaviour {
     public string msg = "msg";
     public string msg1 = "msg1";
     public string msg2 = "msg2";
-    public swipeMonitor swipeScript;
+    private swipeMonitor swipeScript;
 	private static int counter = 0;
 
 	// Use this for initialization

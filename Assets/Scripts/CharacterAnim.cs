@@ -273,7 +273,7 @@ public class CharacterAnim : MonoBehaviour {
 	void updateRunAnimSpeed()	
 	{
 		
-		animation["run"].speed = (float)0.2*Mathf.Abs(sphere.rigidbody.velocity.x);
+		animation["run"].speed = (float)0.2 * Mathf.Abs(sphere.rigidbody.velocity.x);
 		/*
 		foreach(AnimationState animState in animation)
 		{
